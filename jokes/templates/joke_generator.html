@@ -3,21 +3,137 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Joke Generator</title>
+    <title>Anecdote Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #ffefcc; /* Light yellow background */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            text-align: center;
+        }
+
+        h1 {
+            background-color: #ff4500; /* Red header */
+            color: #fff;
+            padding: 20px 0;
+            margin: 0;
+        }
+
+        form {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #fff7e6; /* Bright yellow form background */
+            border: 2px solid #ff4500; /* Red border */
+            border-radius: 10px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        form button {
+            background-color: #ff4500; /* Red button */
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        form button:hover {
+            background-color: #e03c00; /* Darker red on hover */
+        }
+
+        h2 {
+            color: #ff4500;
+            margin-top: 40px;
+            opacity: 0.5;
+        }
+
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0.8;
+        }
+
+        table th, table td {
+            border: 1px solid #ff4500; /* Red borders */
+            padding: 10px;
+            text-align: left;
+            opacity: 0.8;
+        }
+
+        table th {
+            background-color: #ff4500; /* Red header */
+            color: white;
+            opacity: 0.8;
+        }
+
+        table tr:hover {
+            background-color: #ffdd55; /* Bright yellow on hover */
+            opacity: 0.8;
+        }
+
+        /* New generated joke frame styling */
+        #new-generated-joke {
+            background-color: #ffdd55;  /* Light yellow for visibility */
+            padding: 20px;
+            margin-top: 30px;
+            opacity: 1;
+            border: 2px solid #ff4500; /* Red border for the joke frame */
+            border-radius: 10px;
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            text-align: left;
+            font-size: 18px;
+            font-weight: bold;
+        }
+
+        #new-generated-joke h3 {
+            font-size: 22px;
+            color: #ff4500; /* Red title */
+            margin-bottom: 10px;
+        }
+
+        @media (max-width: 600px) {
+            form {
+                width: 90%;
+            }
+
+            table {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <h1>Joke Generator</h1>
+    <h1>Anecdote Generator</h1>
     <form method="POST">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Generate Joke</button>
+        <button type="submit">Generate Anecdote</button>
     </form>
 
-    <h2>Joke History</h2>
-    <table border="1">
+    <!-- New Generated Joke Frame -->
+    <div id="new-generated-joke">
+        <center>
+        <p>{{ recent_joke.joke }}</p>
+        </center>
+    </div>
+
+    <h2>Anecdote History</h2>
+    <table>
         <tr>
             <th>Keyword</th>
-            <th>Joke</th>
+            <th>Anecdote</th>
             <th>Timestamp</th>
         </tr>
         {% for joke in jokes %}

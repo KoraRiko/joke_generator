@@ -23,9 +23,9 @@ def joke_generator(request):
             try:
                 response = openai.chat.completions.create(
                     model="gpt-3.5-turbo",  # You can update the model to a more recent version
-                    messages=[
+                    messages=[ 
                         {"role": "system", "content": "You are a joke generator."},
-                        {"role": "user", "content": f"Tell a joke about {keyword}.Make it original and creative."}
+                        {"role": "user", "content": f"Tell a joke about {keyword}. Make it original and creative."}
                     ],
                     temperature=0.7
                 )
@@ -34,10 +34,13 @@ def joke_generator(request):
                 joke_text = "Sorry, I couldn't generate a joke at the moment. Please try again later."
 
             # Save the joke to the database
-            Joke.objects.create(keyword=keyword, joke=joke_text)
+            new_joke = Joke.objects.create(keyword=keyword, joke=joke_text)
+            
+            # Get the most recent joke after saving it
+            recent_joke = Joke.objects.latest('timestamp')  # Get the latest joke by timestamp
 
-            # Refresh jokes history
-            jokes = Joke.objects.all().order_by('-timestamp')  # Reload jokes after adding the new one
+    # Always fetch jokes in reverse chronological order for display
+    jokes = Joke.objects.all().order_by('-timestamp')  # Reload jokes after adding the new one
 
     # Render the template with the form and the list of jokes
-    return render(request, 'joke_generator.html', {'form': form, 'jokes': jokes})
+    return render(request, 'joke_generator.html', {'form': form, 'jokes': jokes, 'recent_joke': recent_joke})
