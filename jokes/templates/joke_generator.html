@@ -96,12 +96,23 @@
             text-align: left;
             font-size: 18px;
             font-weight: bold;
+            animation: fadeIn 2s forwards;
         }
 
         #new-generated-joke h3 {
             font-size: 22px;
             color: #ff4500; /* Red title */
             margin-bottom: 10px;
+            animation: fadeIn 2s forwards;
+        }
+
+        @keyframes fadeIn {
+            0% {
+                opacity: 0;
+            }
+            100% {
+                opacity: 1;
+            }
         }
 
         @media (max-width: 600px) {
