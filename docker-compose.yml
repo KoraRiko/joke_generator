@@ -1,0 +1,15 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+    container_name: django-doc-cont
+    ports:
+      - "8000:8000"
+    volumes:
+      - .:/app
+    environment:
+      - DEBUG=False
+      - DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1,anecgenerator.com
+      - OPENAI_API_KEY=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

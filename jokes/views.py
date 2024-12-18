@@ -12,7 +12,7 @@ def joke_generator(request):
     form = KeywordForm()
     language_form = LanguageForm()
     jokes = Joke.objects.all().order_by('-timestamp')  # Display jokes in reverse chronological order
-    
+    recent_joke = None
 
     # Handle form submission
     if request.method == "POST":
@@ -53,5 +53,5 @@ def joke_generator(request):
         'form': form, 
         'language_form': language_form, 
         'jokes': jokes, 
-        'recent_joke': recent_joke
+        'recent_joke': recent_joke,
         })
