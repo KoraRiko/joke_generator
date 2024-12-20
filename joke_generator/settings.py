@@ -27,8 +27,8 @@ SECRET_KEY = 'django-insecure-o&j_0r(!jqjtxz=fww137rq-i+yro9usnjr9^@e&s3%+8zg&%o
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1', 'anecgenerator.com']
-
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.anecgenerator.lat', 'anecgenerator.lat']
+CSRF_TRUSTED_ORIGINS = ['https://anecgenerator.lat']
 
 # Application definition
 
