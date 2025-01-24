@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = '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'
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
