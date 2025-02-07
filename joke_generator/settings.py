@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 
-OPENAI_API_KEY = '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'
+OPENAI_API_KEY = #*chat gpt api*
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
