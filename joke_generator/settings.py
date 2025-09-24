@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
-OPENAI_API_KEY = #*chat gpt api*
+OPENAI_API_KEY = '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'
 
 
 

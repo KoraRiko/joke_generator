@@ -1,5 +1,12 @@
 Render : https://dashboard.render.com/web/srv-ctia3i9opnds739q4po0/deploys/dep-cticep5svqrc73ft1j8g
 
+Comands for lockalhost:
+  Install dependencies (if needed):   pip install -r requirements.txt
+  Apply migrations:                   python manage.py makemigrations
+                                      python manage.py migrate
+  Start the development server:       python manage.py runserver
+
+
 Docker_hub : korarika/django-docker
 
 Comands for Docker:

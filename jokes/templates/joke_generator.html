@@ -132,30 +132,44 @@
         {% csrf_token %}
         {{ form.as_p }}
         {{ language_form.as_p }}
-        <button type="submit">Generate Anecdote</button>
+        <button type="submit" name="generate_joke">Generate Anecdote</button>
+        <button type="submit" name="generate_quote">Generate Motivation Quote</button>
     </form>
 
-    <!-- New Generated Joke Frame -->
+    {% if generated_text %}
     <div id="new-generated-joke">
-        <center>
-        <p>{{ recent_joke.joke }}</p>
-        </center>
+        <h3>{{ generated_type|title }}:</h3>
+        <p>{{ generated_text }}</p>
     </div>
+    {% endif %}
 
-    <h2>Anecdote History</h2>
+    <h2>History</h2>
     <table>
         <tr>
             <th>Keyword</th>
-            <th>Anecdote</th>
-            <th>Timestamp</th>
+            <th>Type</th>
+            <th>Generated Text</th>
+            <th>Date</th>
         </tr>
-        {% for joke in jokes %}
+        {% for item in history %}
         <tr>
-            <td>{{ joke.keyword }}</td>
-            <td>{{ joke.joke }}</td>
-            <td>{{ joke.timestamp }}</td>
+            <td>{{ item.keyword }}</td>
+            <td>{{ item.type }}</td>
+            <td>{{ item.text }}</td>
+            <td>{{ item.timestamp|date:"n/j/Y" }}</td>
         </tr>
         {% endfor %}
     </table>
+    <div style="margin: 20px;">
+    {% if history.has_previous %}
+        <a href="?page={{ history.previous_page_number }}">&#8592; Prev</a>
+    {% endif %}
+
+    <span style="padding: 0 10px;">{{ history.number }}/{{ history.paginator.num_pages }}</span>
+
+    {% if history.has_next %}
+        <a href="?page={{ history.next_page_number }}">Next &#8594;</a>
+    {% endif %}
+</div>
 </body>
 </html>
