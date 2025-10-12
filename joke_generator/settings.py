@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 OPENAI_API_KEY = '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'
 
@@ -26,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o&j_0r(!jqjtxz=fww137rq-i+yro9usnjr9^@e&s3%+8zg&%o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
 
 ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'www.anecgenerator.lat', 'anecgenerator.lat']
 CSRF_TRUSTED_ORIGINS = ['https://anecgenerator.lat']
@@ -120,6 +121,10 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
 STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [
+    BASE_DIR / 'jokes' / 'static',
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
