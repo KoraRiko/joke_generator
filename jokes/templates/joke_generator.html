@@ -95,12 +95,36 @@
                     </thead>
                     <tbody>
                         {% for item in history %}
-                        <tr>
+                        {% with entry_id=forloop.counter0|stringformat:"s" %}
+                        <tr class="history-row" data-history-id="{{ entry_id }}">
                             <td>{{ item.keyword }}</td>
                             <td>{{ item.type }}</td>
-                            <td class="history-text">{{ item.text }}</td>
+                            <td class="history-text">
+                                <button type="button" class="history-text-button" data-history-id="{{ entry_id }}">
+                                    {{ item.text }}
+                                </button>
+                            </td>
                             <td>{{ item.timestamp|date:"n/j/Y" }}</td>
                         </tr>
+                        <tr class="history-expanded-row" data-history-id="{{ entry_id }}" hidden>
+                            <td colspan="4">
+                                <div class="history-expanded">
+                                    <header class="history-expanded-header">
+                                        <span class="history-expanded-label">{{ item.type|title }}</span>
+                                        <span class="history-expanded-meta">Keyword: {{ item.keyword }} • {{
+                                            item.timestamp|date:"n/j/Y" }}</span>
+                                    </header>
+                                    <div class="history-expanded-body">{{ item.text }}</div>
+                                    <div class="history-expanded-actions">
+                                        <button type="button" class="primary-button" data-expanded-copy
+                                            data-text="{{ item.text|escape }}">Copy text</button>
+                                        <button type="button" class="ghost-button" data-expanded-download
+                                            data-text="{{ item.text|escape }}">Download</button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endwith %}
                         {% empty %}
                         <tr>
                             <td class="history-empty" colspan="4">No history yet. Generate your first entry to see it
@@ -144,8 +168,20 @@
         document.addEventListener('DOMContentLoaded', () => {
             const bindResultActions = () => {
                 const resultText = document.querySelector('[data-generated-text]');
-                const copyBtn = document.querySelector('[data-action="copy"]');
-                const downloadBtn = document.querySelector('[data-action="download"]');
+                let copyBtn = document.querySelector('[data-action="copy"]');
+                let downloadBtn = document.querySelector('[data-action="download"]');
+
+                if (copyBtn) {
+                    const refreshedCopy = copyBtn.cloneNode(true);
+                    copyBtn.replaceWith(refreshedCopy);
+                    copyBtn = refreshedCopy;
+                }
+
+                if (downloadBtn) {
+                    const refreshedDownload = downloadBtn.cloneNode(true);
+                    downloadBtn.replaceWith(refreshedDownload);
+                    downloadBtn = refreshedDownload;
+                }
 
                 if (resultText && copyBtn) {
                     copyBtn.addEventListener('click', async () => {
@@ -156,7 +192,7 @@
                         } catch (err) {
                             console.error('Unable to copy text', err);
                         }
-                    }, { once: true });
+                    });
                 }
 
                 if (resultText && downloadBtn) {
@@ -170,13 +206,36 @@
                         anchor.click();
                         anchor.remove();
                         URL.revokeObjectURL(url);
-                    }, { once: true });
+                    });
                 }
             };
 
             bindResultActions();
 
             const historyCardSelector = '[data-history-card]';
+
+            const collapseAllExpandedRows = () => {
+                document.querySelectorAll('.history-expanded-row').forEach(row => {
+                    row.hidden = true;
+                    row.classList.remove('visible');
+                });
+                document.querySelectorAll('.history-text-button').forEach(btn => btn.classList.remove('active'));
+            };
+
+            const toggleExpandedRow = (button) => {
+                const id = button.dataset.historyId;
+                const row = document.querySelector(`.history-expanded-row[data-history-id="${id}"]`);
+                if (!row) {
+                    return;
+                }
+                const isOpen = !row.hasAttribute('hidden');
+                collapseAllExpandedRows();
+                if (!isOpen) {
+                    row.hidden = false;
+                    requestAnimationFrame(() => row.classList.add('visible'));
+                    button.classList.add('active');
+                }
+            };
 
             async function swapHistoryCard(url) {
                 const currentCard = document.querySelector(historyCardSelector);
@@ -210,6 +269,7 @@
 
                     currentCard.replaceWith(nextCard);
                     bindResultActions();
+                    collapseAllExpandedRows();
                 } catch (error) {
                     console.error('Falling back to full navigation', error);
                     window.location.href = url;
@@ -218,15 +278,47 @@
                 }
             }
 
-            document.addEventListener('click', (event) => {
+            document.addEventListener('click', async (event) => {
                 const link = event.target.closest('.pagination-controls a');
-
-                if (!link) {
+                if (link) {
+                    event.preventDefault();
+                    swapHistoryCard(link.href);
                     return;
                 }
 
-                event.preventDefault();
-                swapHistoryCard(link.href);
+                const textButton = event.target.closest('.history-text-button');
+                if (textButton) {
+                    event.preventDefault();
+                    toggleExpandedRow(textButton);
+                    return;
+                }
+
+                const expandedCopy = event.target.closest('[data-expanded-copy]');
+                if (expandedCopy) {
+                    const text = expandedCopy.getAttribute('data-text') || '';
+                    try {
+                        await navigator.clipboard.writeText(text);
+                        expandedCopy.classList.add('success');
+                        setTimeout(() => expandedCopy.classList.remove('success'), 1500);
+                    } catch (err) {
+                        console.error('Clipboard error', err);
+                    }
+                    return;
+                }
+
+                const expandedDownload = event.target.closest('[data-expanded-download]');
+                if (expandedDownload) {
+                    const text = expandedDownload.getAttribute('data-text') || '';
+                    const blob = new Blob([text], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const anchor = document.createElement('a');
+                    anchor.href = url;
+                    anchor.download = 'anegen-history.txt';
+                    document.body.appendChild(anchor);
+                    anchor.click();
+                    anchor.remove();
+                    URL.revokeObjectURL(url);
+                }
             });
         });
     </script>
