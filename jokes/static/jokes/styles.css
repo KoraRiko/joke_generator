@@ -68,31 +68,35 @@ body {
 
 .hero-emoji--top-left {
     left: clamp(24px, 6vw, 70px);
+    transform: rotate(-12deg);
+    filter: brightness(0) saturate(100%) invert(96%) sepia(9%) saturate(1401%) hue-rotate(325deg) brightness(102%) contrast(105%);
 }
 
 .hero-emoji--top-right {
     right: clamp(24px, 6vw, 70px);
-    transform: scaleX(-1);
-}
-
-.page-emoji {
-    z-index: 0;
+    transform: rotate(12deg);
+    filter: brightness(0) saturate(100%) invert(96%) sepia(9%) saturate(1401%) hue-rotate(325deg) brightness(102%) contrast(105%);
 }
 
 .page-emoji--mid-left {
     top: clamp(320px, 38vh, 420px);
     left: clamp(12px, 5vw, 60px);
+    transform: rotate(-12deg);
+    filter: brightness(0) saturate(100%) invert(88%) sepia(10%) saturate(2577%) hue-rotate(325deg) brightness(104%) contrast(101%);
 }
 
 .page-emoji--mid-right {
     bottom: clamp(160px, 30vh, 280px);
     right: clamp(12px, 5vw, 60px);
+    transform: rotate(12deg);
+    filter: brightness(0) saturate(100%) invert(88%) sepia(10%) saturate(2577%) hue-rotate(325deg) brightness(104%) contrast(101%);
 }
 
 .footer-emoji {
     bottom: 18px;
     width: clamp(72px, 8vw, 110px);
     opacity: 0.9;
+    filter: brightness(0) saturate(100%) invert(96%) sepia(9%) saturate(1401%) hue-rotate(325deg) brightness(102%) contrast(105%);
 }
 
 .footer-emoji--left {
