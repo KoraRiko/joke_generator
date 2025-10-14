@@ -1,57 +1,235 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
-    <link rel="stylesheet" href="{% static 'jokes/style.css' %}">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Anecdote Generator</title>
-    
+    <link rel="stylesheet" href="{% static 'jokes/styles.css' %}">
 </head>
+
 <body>
-    <h1> Anegen (Anecdote Generator) </h1>
-    <form method="POST">
-        {% csrf_token %}
-        {{ form.as_p }}
-        {{ language_form.as_p }}
-        <button type="submit" name="generate_joke">Generate Anecdote</button>
-        <button type="submit" name="generate_quote">Generate Motivation Quote</button>
-    </form>
+    <div class="page-shell">
+        <header class="hero">
+            <img class="emoji hero-emoji hero-emoji--top-left" src="{% static 'jokes/img/emoji-placeholder.svg' %}"
+                alt="" role="presentation">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <h1>Anegen</h1>
+                </div>
+            </div>
+            <img class="emoji hero-emoji hero-emoji--top-right" src="{% static 'jokes/img/emoji-placeholder.svg' %}"
+                alt="" role="presentation">
+        </header>
 
-    {% if generated_text %}
-    <div id="new-generated-joke">
-        <h3>{{ generated_type|title }}:</h3>
-        <p>{{ generated_text }}</p>
+        <img class="emoji page-emoji page-emoji--mid-left" src="{% static 'jokes/img/emoji-placeholder.svg' %}" alt=""
+            role="presentation">
+        <img class="emoji page-emoji page-emoji--mid-right" src="{% static 'jokes/img/emoji-placeholder.svg' %}" alt=""
+            role="presentation">
+
+        <main class="main-content">
+            <p class="intro-text">
+                Anegen is an AI-powered anecdote generator.<br>
+                Generate anecdotes within a few clicks!
+            </p>
+            <section class="card generator-card">
+                <form method="POST" class="generator-form">
+                    {% csrf_token %}
+                    <div class="field-row">
+                        <label for="{{ form.keyword.id_for_label }}">Enter keyword</label>
+                        <div class="field-input">
+                            {{ form.keyword }}
+                            {% if form.keyword.errors %}
+                            <span class="field-error">{{ form.keyword.errors|striptags }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <label for="{{ language_form.language.id_for_label }}">Enter language</label>
+                        <div class="field-input">
+                            {{ language_form.language }}
+                            {% if language_form.language.errors %}
+                            <span class="field-error">{{ language_form.language.errors|striptags }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+
+                    <div class="form-actions">
+                        <button type="submit" name="generate_joke" class="primary-button">Generate anecdote</button>
+                        <button type="submit" name="generate_quote" class="primary-button">Generate motivation
+                            quote</button>
+                    </div>
+                </form>
+            </section>
+
+            {% if generated_text %}
+            <section class="card result-card" id="new-generated-joke">
+                <div class="result-heading">{{ generated_type|title }}</div>
+                <p class="result-text" data-generated-text
+                    data-generated-type="{{ generated_type|default:'anegen-output' }}">{{ generated_text }}</p>
+                <div class="result-actions">
+                    <button type="button" class="ghost-button" data-action="copy" aria-label="Copy generated text">
+                        <img class="icon icon-copy" src="{% static 'jokes/img/copy-placeholder.svg' %}" alt=""
+                            role="presentation">
+                    </button>
+                    <button type="button" class="ghost-button" data-action="download"
+                        aria-label="Download generated text">
+                        <img class="icon icon-download" src="{% static 'jokes/img/download-placeholder.svg' %}" alt=""
+                            role="presentation">
+                    </button>
+                </div>
+            </section>
+            {% endif %}
+
+            <section class="card history-card" data-history-card>
+                <h2 class="card-title">History</h2>
+                <table class="history-table">
+                    <thead>
+                        <tr>
+                            <th scope="col">Keyword</th>
+                            <th scope="col">Type</th>
+                            <th scope="col">Generated Text</th>
+                            <th scope="col">Date</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in history %}
+                        <tr>
+                            <td>{{ item.keyword }}</td>
+                            <td>{{ item.type }}</td>
+                            <td class="history-text">{{ item.text }}</td>
+                            <td>{{ item.timestamp|date:"n/j/Y" }}</td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td class="history-empty" colspan="4">No history yet. Generate your first entry to see it
+                                here.</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <div class="pagination-controls">
+                    {% if history.has_previous %}
+                    <a class="pagination-button" href="?page={{ history.previous_page_number }}"
+                        aria-label="Previous page">&#9664;</a>
+                    {% else %}
+                    <span class="pagination-button disabled" aria-hidden="true">&#9664;</span>
+                    {% endif %}
+
+                    <span class="pagination-current">{{ history.number }}/{{ history.paginator.num_pages }}</span>
+
+                    {% if history.has_next %}
+                    <a class="pagination-button" href="?page={{ history.next_page_number }}"
+                        aria-label="Next page">&#9654;</a>
+                    {% else %}
+                    <span class="pagination-button disabled" aria-hidden="true">&#9654;</span>
+                    {% endif %}
+                </div>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <div>v1.0.0</div>
+            <div>Contacts: <a href="mailto:support@anegen.en">support@anegen.en</a></div>
+        </footer>
+
+        <img class="emoji footer-emoji footer-emoji--left" src="{% static 'jokes/img/thumbs-placeholder.svg' %}" alt=""
+            role="presentation">
+        <img class="emoji footer-emoji footer-emoji--right" src="{% static 'jokes/img/thumbs-placeholder.svg' %}" alt=""
+            role="presentation">
     </div>
-    {% endif %}
 
-    <h2>History</h2>
-    <table>
-        <tr>
-            <th>Keyword</th>
-            <th>Type</th>
-            <th>Generated Text</th>
-            <th>Date</th>
-        </tr>
-        {% for item in history %}
-        <tr>
-            <td>{{ item.keyword }}</td>
-            <td>{{ item.type }}</td>
-            <td>{{ item.text }}</td>
-            <td>{{ item.timestamp|date:"n/j/Y" }}</td>
-        </tr>
-        {% endfor %}
-    </table>
-    <div style="margin: 20px;">
-    {% if history.has_previous %}
-        <a href="?page={{ history.previous_page_number }}">&#8592; Prev</a>
-    {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const bindResultActions = () => {
+                const resultText = document.querySelector('[data-generated-text]');
+                const copyBtn = document.querySelector('[data-action="copy"]');
+                const downloadBtn = document.querySelector('[data-action="download"]');
 
-    <span style="padding: 0 10px;">{{ history.number }}/{{ history.paginator.num_pages }}</span>
+                if (resultText && copyBtn) {
+                    copyBtn.addEventListener('click', async () => {
+                        try {
+                            await navigator.clipboard.writeText(resultText.textContent.trim());
+                            copyBtn.classList.add('success');
+                            setTimeout(() => copyBtn.classList.remove('success'), 1500);
+                        } catch (err) {
+                            console.error('Unable to copy text', err);
+                        }
+                    }, { once: true });
+                }
 
-    {% if history.has_next %}
-        <a href="?page={{ history.next_page_number }}">Next &#8594;</a>
-    {% endif %}
-</div>
+                if (resultText && downloadBtn) {
+                    downloadBtn.addEventListener('click', () => {
+                        const blob = new Blob([resultText.textContent.trim()], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const anchor = document.createElement('a');
+                        anchor.href = url;
+                        anchor.download = `${(resultText.dataset.generatedType || 'anegen-output').replace(/\s+/g, '-').toLowerCase()}.txt`;
+                        document.body.appendChild(anchor);
+                        anchor.click();
+                        anchor.remove();
+                        URL.revokeObjectURL(url);
+                    }, { once: true });
+                }
+            };
+
+            bindResultActions();
+
+            const historyCardSelector = '[data-history-card]';
+
+            async function swapHistoryCard(url) {
+                const currentCard = document.querySelector(historyCardSelector);
+
+                if (!currentCard) {
+                    window.location.href = url;
+                    return;
+                }
+
+                currentCard.classList.add('loading');
+
+                try {
+                    const response = await fetch(url, {
+                        headers: {
+                            'X-Requested-With': 'fetch',
+                        },
+                    });
+
+                    if (!response.ok) {
+                        throw new Error(`Unexpected response: ${response.status}`);
+                    }
+
+                    const html = await response.text();
+                    const parser = new DOMParser();
+                    const doc = parser.parseFromString(html, 'text/html');
+                    const nextCard = doc.querySelector(historyCardSelector);
+
+                    if (!nextCard) {
+                        throw new Error('History section missing in response');
+                    }
+
+                    currentCard.replaceWith(nextCard);
+                    bindResultActions();
+                } catch (error) {
+                    console.error('Falling back to full navigation', error);
+                    window.location.href = url;
+                } finally {
+                    currentCard.classList.remove('loading');
+                }
+            }
+
+            document.addEventListener('click', (event) => {
+                const link = event.target.closest('.pagination-controls a');
+
+                if (!link) {
+                    return;
+                }
+
+                event.preventDefault();
+                swapHistoryCard(link.href);
+            });
+        });
+    </script>
 </body>
+
 </html>
