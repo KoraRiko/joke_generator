@@ -8,10 +8,9 @@ services:
     volumes:
       - .:/app
     environment:
-      - DEBUG=False
+      - DEBUG=True
       - DJANGO_ALLOWED_HOSTS=localhost,anecgenerator.lat,anegen.lat,django-docker-tj2p.onrender.com,anegen.onrender.com
-      - OPENAI_API_KEY=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
-      - PORT=10000
+      - OPENAI_API_KEY=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
   nginx:
     image: nginx:latest
     container_name: nginx-cont
