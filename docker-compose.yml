@@ -2,7 +2,7 @@ services:
   web:
     build:
       context: .
-    container_name: django-doc-cont
+    container_name: django-anegen-cont
     ports:
       - "8000:8000"
     volumes:

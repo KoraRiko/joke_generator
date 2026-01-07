@@ -6,7 +6,24 @@ Comands for lockalhost:
                                       python manage.py migrate
   Start the development server:       python manage.py runserver
 
+  -------------------------
+  Docker_hub : korarika/anegen
 
+Comands for Docker:
+
+docker build -t anegen:latest .
+
+docker run -d --name django-anegen-cont -p 8000:8000 anegen
+
+*delete container "django-anegen-cont"*
+
+docker-compose up -d
+
+docker tag anegen korarika/anegen
+
+docker push korarika/anegen
+
+legacy:
 Docker_hub : korarika/django-docker
 
 Comands for Docker:
