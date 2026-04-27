@@ -1,74 +1,59 @@
-from itertools import chain
-from operator import attrgetter
-
 import openai
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.shortcuts import render
 
-from .forms import KeywordForm, LanguageForm
-from .models import Joke, Quote
+from .forms import KeywordForm
+from .models import Joke
 
 # Set the OpenAI API key
 openai.api_key = settings.OPENAI_API_KEY
 
 def joke_generator(request):
     form = KeywordForm()
-    language_form = LanguageForm()
     generated_text = None
-    generated_type = None
+    generated_joke_id = None
 
     if request.method == "POST":
-        form = KeywordForm(request.POST)
-        language_form = LanguageForm(request.POST)
-        if form.is_valid() and language_form.is_valid():
-            keyword = form.cleaned_data["keyword"]
-            language = (language_form.cleaned_data["language"] or "").strip() or "English"
-
-            if "generate_joke" in request.POST:
-                try:
-                    response = openai.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "system", "content": "You are a joke generator."},
-                            {"role": "user", "content": f"Tell a joke about {keyword} only in {language} language. Make it original and creative."},
-                        ],
-                        temperature=0.7,
-                    )
-                    joke_text = response.choices[0].message.content.strip()
-                except Exception:
-                    joke_text = "Sorry, I couldn't generate a joke at the moment. Please try again later."
-                Joke.objects.create(keyword=keyword, text=joke_text, type="anecdote")
-                generated_text = joke_text
-                generated_type = "anecdote"
-
-            elif "generate_quote" in request.POST:
-                try:
-                    response = openai.chat.completions.create(
-                        model="gpt-3.5-turbo",
-                        messages=[
-                            {"role": "system", "content": "You are a motivational quote generator."},
-                            {"role": "user", "content": f"Give me a motivational quote about {keyword} only in {language} language."},
-                        ],
-                        temperature=0.7,
-                    )
-                    quote_text = response.choices[0].message.content.strip()
-                except Exception:
-                    quote_text = "Sorry, I couldn't generate a quote at the moment. Please try again later."
-                Quote.objects.create(keyword=keyword, text=quote_text, type="quote")
-                generated_text = quote_text
-                generated_type = "quote"
-
+        # Handle rating submission - don't process as form
+        if "rate_joke" in request.POST:
+            try:
+                joke_id = request.POST.get("joke_id")
+                rating = int(request.POST.get("rating"))
+                if 1 <= rating <= 10:
+                    joke = Joke.objects.get(id=joke_id)
+                    joke.rating = rating
+                    joke.save()
+            except (ValueError, Joke.DoesNotExist):
+                pass
+            # Don't process further - just return with empty form
             form = KeywordForm()
-            language_form = LanguageForm()
+        else:
+            # Handle joke generation
+            form = KeywordForm(request.POST)
+            if form.is_valid():
+                keyword = form.cleaned_data["keyword"]
 
-    jokes = Joke.objects.all()
-    quotes = Quote.objects.all()
-    history = sorted(
-        chain(jokes, quotes),
-        key=attrgetter("timestamp"),
-        reverse=True,
-    )
+                if "generate_joke" in request.POST:
+                    try:
+                        response = openai.chat.completions.create(
+                            model="ft:gpt-3.5-turbo-0125:korariko::DQ1ft67K",
+                            messages=[
+                                {"role": "system", "content": "You are a funny assistant. Generate a short, clever joke based on the given keyword."},
+                                {"role": "user", "content": f"Generate a joke about: {keyword} "},
+                            ],
+                            temperature=0.7,
+                        )
+                        joke_text = response.choices[0].message.content.strip()
+                    except Exception:
+                        joke_text = "Sorry, I couldn't generate a joke at the moment. Please try again later."
+                    joke_obj = Joke.objects.create(keyword=keyword, text=joke_text)
+                    generated_text = joke_text
+                    generated_joke_id = joke_obj.id
+
+                form = KeywordForm()
+
+    history = Joke.objects.order_by("-timestamp")
 
     paginator = Paginator(history, 5)
     page_number = request.GET.get("page")
@@ -79,9 +64,8 @@ def joke_generator(request):
         "joke_generator.html",
         {
             "form": form,
-            "language_form": language_form,
             "generated_text": generated_text,
-            "generated_type": generated_type,
+            "generated_joke_id": generated_joke_id,
             "history": page_obj,
         },
     )

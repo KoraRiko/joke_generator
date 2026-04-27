@@ -31,7 +31,7 @@
         <main class="main-content">
             <p class="intro-text">
                 Anegen is an AI-powered anecdote generator.<br>
-                Generate anecdotes within a few clicks!
+                Generate your unique anecdotes within a few clicks!
             </p>
             <section class="card generator-card">
                 <form method="POST" class="generator-form">
@@ -45,29 +45,18 @@
                             {% endif %}
                         </div>
                     </div>
-                    <div class="field-row">
-                        <label for="{{ language_form.language.id_for_label }}">Enter language</label>
-                        <div class="field-input">
-                            {{ language_form.language }}
-                            {% if language_form.language.errors %}
-                            <span class="field-error">{{ language_form.language.errors|striptags }}</span>
-                            {% endif %}
-                        </div>
-                    </div>
 
                     <div class="form-actions">
                         <button type="submit" name="generate_joke" class="primary-button">Generate anecdote</button>
-                        <button type="submit" name="generate_quote" class="primary-button">Generate motivation
-                            quote</button>
                     </div>
                 </form>
             </section>
 
             {% if generated_text %}
             <section class="card result-card" id="new-generated-joke">
-                <div class="result-heading">{{ generated_type|title }}</div>
+                <div class="result-heading">Joke</div>
                 <p class="result-text" data-generated-text
-                    data-generated-type="{{ generated_type|default:'anegen-output' }}">{{ generated_text }}</p>
+                    data-generated-type="anegen-output">{{ generated_text }}</p>
                 <div class="result-actions">
                     <button type="button" class="ghost-button" data-action="copy" aria-label="Copy generated text">
                         <img class="icon icon-copy" src="{% static 'jokes/img/copy-placeholder.svg' %}" alt=""
@@ -79,6 +68,21 @@
                             role="presentation">
                     </button>
                 </div>
+                <div class="rating-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    <p style="margin-bottom: 10px; font-weight: 500;">Rate this joke:</p>
+                    <form method="POST" id="rating-form" style="display: flex; gap: 10px; align-items: center;">
+                        {% csrf_token %}
+                        <input type="hidden" name="joke_id" value="{{ generated_joke_id }}">
+                        <input type="hidden" name="rate_joke" value="1">
+                        <div class="rating-scale" style="display: flex; gap: 5px;">
+                            {% for i in "1234567890" %}
+                                {% if forloop.counter <= 10 %}
+                                <button type="button" class="rating-btn" data-rating="{{ forloop.counter }}" style="width: 30px; height: 30px; padding: 0; border: 2px solid #ddd; border-radius: 4px; background: white; cursor: pointer; font-weight: 500; transition: all 0.2s;">{{ forloop.counter }}</button>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                    </form>
+                </div>
             </section>
             {% endif %}
 
@@ -88,8 +92,8 @@
                     <thead>
                         <tr>
                             <th scope="col">Keyword</th>
-                            <th scope="col">Type</th>
                             <th scope="col">Generated Text</th>
+                            <th scope="col">Rating</th>
                             <th scope="col">Date</th>
                         </tr>
                     </thead>
@@ -98,19 +102,19 @@
                         {% with entry_id=forloop.counter0|stringformat:"s" %}
                         <tr class="history-row" data-history-id="{{ entry_id }}">
                             <td>{{ item.keyword }}</td>
-                            <td>{{ item.type }}</td>
                             <td class="history-text">
                                 <button type="button" class="history-text-button" data-history-id="{{ entry_id }}">
                                     {{ item.text }}
                                 </button>
                             </td>
+                            <td>{{ item.rating|default:"—" }}</td>
                             <td>{{ item.timestamp|date:"n/j/Y" }}</td>
                         </tr>
                         <tr class="history-expanded-row" data-history-id="{{ entry_id }}" hidden>
                             <td colspan="4">
                                 <div class="history-expanded">
                                     <header class="history-expanded-header">
-                                        <span class="history-expanded-label">{{ item.type|title }}</span>
+                                        <span class="history-expanded-label">Joke</span>
                                         <span class="history-expanded-meta">Keyword: {{ item.keyword }} -
                                             {{item.timestamp|date:"n/j/Y" }}</span>
                                     </header>
@@ -318,6 +322,20 @@
                     anchor.click();
                     anchor.remove();
                     URL.revokeObjectURL(url);
+                }
+
+                const ratingBtn = event.target.closest('[data-rating]');
+                if (ratingBtn) {
+                    const rating = ratingBtn.getAttribute('data-rating');
+                    const ratingForm = document.getElementById('rating-form');
+                    if (ratingForm) {
+                        const ratingInput = document.createElement('input');
+                        ratingInput.type = 'hidden';
+                        ratingInput.name = 'rating';
+                        ratingInput.value = rating;
+                        ratingForm.appendChild(ratingInput);
+                        ratingForm.submit();
+                    }
                 }
             });
         });
