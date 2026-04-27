@@ -67,6 +67,9 @@
                         <img class="icon icon-download" src="{% static 'jokes/img/download-placeholder.svg' %}" alt=""
                             role="presentation">
                     </button>
+                    <button type="button" class="ghost-button" data-action="explain" aria-label="Explain this joke" title="Explain">
+                        <span style="font-size: 18px;">?</span>
+                    </button>
                 </div>
                 <div class="rating-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
                     <p style="margin-bottom: 10px; font-weight: 500;">Rate this joke:</p>
@@ -82,6 +85,10 @@
                             {% endfor %}
                         </div>
                     </form>
+                </div>
+                <div id="explanation-section" style="margin-top: 15px; padding: 15px; background: #f5f5f5; border-radius: 4px; display: none;">
+                    <p style="margin: 0; font-weight: 500; color: #333;">💡 Explanation:</p>
+                    <p id="explanation-text" style="margin: 10px 0 0 0; color: #555; line-height: 1.5;"></p>
                 </div>
             </section>
             {% endif %}
@@ -211,6 +218,50 @@
                         anchor.remove();
                         URL.revokeObjectURL(url);
                     });
+                }
+
+                if (copyBtn || downloadBtn) {
+                    const explainBtn = document.querySelector('[data-action="explain"]');
+                    if (explainBtn) {
+                        const jokeIdInput = document.querySelector('input[name="joke_id"]');
+                        if (jokeIdInput) {
+                            explainBtn.addEventListener('click', async () => {
+                                const jokeId = jokeIdInput.value;
+                                const explanationSection = document.getElementById('explanation-section');
+                                const explanationText = document.getElementById('explanation-text');
+                                
+                                explainBtn.style.opacity = '0.5';
+                                explainBtn.style.pointerEvents = 'none';
+                                explanationText.textContent = 'Loading explanation...';
+                                explanationSection.style.display = 'block';
+                                
+                                try {
+                                    const formData = new FormData();
+                                    formData.append('explain_joke', '1');
+                                    formData.append('joke_id', jokeId);
+                                    formData.append('csrfmiddlewaretoken', document.querySelector('[name="csrfmiddlewaretoken"]').value);
+                                    
+                                    const response = await fetch(window.location.href, {
+                                        method: 'POST',
+                                        body: formData,
+                                    });
+                                    
+                                    const data = await response.json();
+                                    if (data.success) {
+                                        explanationText.textContent = data.explanation;
+                                    } else {
+                                        explanationText.textContent = 'Sorry, I could not explain this joke.';
+                                    }
+                                } catch (error) {
+                                    console.error('Error explaining joke:', error);
+                                    explanationText.textContent = 'Error loading explanation.';
+                                } finally {
+                                    explainBtn.style.opacity = '1';
+                                    explainBtn.style.pointerEvents = 'auto';
+                                }
+                            });
+                        }
+                    }
                 }
             };
 

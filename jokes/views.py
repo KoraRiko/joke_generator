@@ -2,6 +2,7 @@ import openai
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from .forms import KeywordForm
 from .models import Joke
@@ -15,6 +16,24 @@ def joke_generator(request):
     generated_joke_id = None
 
     if request.method == "POST":
+        # Handle joke explanation - return JSON
+        if "explain_joke" in request.POST:
+            try:
+                joke_id = request.POST.get("joke_id")
+                joke = Joke.objects.get(id=joke_id)
+                response = openai.chat.completions.create(
+                    model="ft:gpt-3.5-turbo-0125:korariko::DQ1ft67K",
+                    messages=[
+                        {"role": "system", "content": "You are a helpful assistant that explains jokes in a friendly way."},
+                        {"role": "user", "content": f"Explain this joke in a natural paragraph (no numbering or bullet points): '{joke.text}'\n\nExplain what makes it funny, the wordplay/punchline, and how it relates to the keyword '{joke.keyword}'. Keep it concise and conversational."},
+                    ],
+                    temperature=0.7,
+                )
+                explanation = response.choices[0].message.content.strip()
+                return JsonResponse({"success": True, "explanation": explanation})
+            except (Joke.DoesNotExist, Exception):
+                return JsonResponse({"success": False, "explanation": "Could not explain this joke."})
+        
         # Handle rating submission - don't process as form
         if "rate_joke" in request.POST:
             try:
