@@ -22,10 +22,10 @@ def joke_generator(request):
                 joke_id = request.POST.get("joke_id")
                 joke = Joke.objects.get(id=joke_id)
                 response = openai.chat.completions.create(
-                    model="ft:gpt-3.5-turbo-0125:korariko::DQ1ft67K",
+                    model="gpt-3.5-turbo",
                     messages=[
                         {"role": "system", "content": "You are a helpful assistant that explains jokes in a friendly way."},
-                        {"role": "user", "content": f"Explain this joke in a natural paragraph (no numbering or bullet points): '{joke.text}'\n\nExplain what makes it funny, the wordplay/punchline, and how it relates to the keyword '{joke.keyword}'. Keep it concise and conversational."},
+                        {"role": "user", "content": f"Explain this joke in simple words, so everyone can understand it. Write it as a natural paragraph (no numbering or bullet points): '{joke.text}'\n\nExplain what makes it funny, the wordplay/punchline, and how it relates to the keyword '{joke.keyword}'."},
                     ],
                     temperature=0.7,
                 )
@@ -56,12 +56,12 @@ def joke_generator(request):
                 if "generate_joke" in request.POST:
                     try:
                         response = openai.chat.completions.create(
-                            model="ft:gpt-3.5-turbo-0125:korariko::DQ1ft67K",
+                            model="ft:gpt-4o-mini-2024-07-18:korariko::DZmqELMy",
                             messages=[
-                                {"role": "system", "content": "You are a funny assistant. Generate a short, clever joke based on the given keyword."},
-                                {"role": "user", "content": f"Generate a joke about: {keyword} "},
-                            ],
-                            temperature=0.7,
+                                {"role": "system","content": "You are a professional comedy writer specializing in clever wordplay and safe-but-edgy humor. Apply the Benign Violation principle — break an expectation or norm, but keep it safe and clever. Avoid anything offensive, political, or controversial. Be witty, surprising, and concise."},
+                                {"role": "user","content": f"""Generate a short, clever joke about: {keyword}. Rules: ,Setup must build a clear expectation , Punchline must subvert it with wordplay or unexpected twist ,Maximum 2 sentences,Must make logical sense""" },
+                                    ],
+                            temperature=0.9,
                         )
                         joke_text = response.choices[0].message.content.strip()
                     except Exception:

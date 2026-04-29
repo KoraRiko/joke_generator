@@ -41,7 +41,15 @@
                         <div class="field-input">
                             {{ form.keyword }}
                             {% if form.keyword.errors %}
-                            <span class="field-error">{{ form.keyword.errors|striptags }}</span>
+                            <span class="field-error" style="color: #d32f2f; display: block; margin-top: 8px; font-weight: 500;">
+                                ⚠️ Only English letters please
+                            </span>
+                            <style>
+                                #{{ form.keyword.id_for_label }} {
+                                    border: 2px solid #d32f2f !important;
+                                    background-color: #ffebee !important;
+                                }
+                            </style>
                             {% endif %}
                         </div>
                     </div>
@@ -67,7 +75,7 @@
                         <img class="icon icon-download" src="{% static 'jokes/img/download-placeholder.svg' %}" alt=""
                             role="presentation">
                     </button>
-                    <button type="button" class="ghost-button" data-action="explain" aria-label="Explain this joke" title="Explain">
+                    <button type="button" class="ghost-button" data-action="explain" aria-label="Explain this joke" title="Explain joke">
                         <span style="font-size: 18px;">?</span>
                     </button>
                 </div>
