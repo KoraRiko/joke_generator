@@ -15,13 +15,16 @@ docker build -t anegen:latest .
 
 docker run -d --name django-anegen-cont -p 8000:8000 anegen
 
-*delete container "django-anegen-cont"*
+*docker stop django-anegen-cont*
+*docker rm django-anegen-cont*
 
 docker-compose up -d
 
 docker tag anegen korarika/anegen
 
 docker push korarika/anegen
+
+
 
 legacy:
 Docker_hub : korarika/django-docker
