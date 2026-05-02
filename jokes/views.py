@@ -56,10 +56,10 @@ def joke_generator(request):
                 if "generate_joke" in request.POST:
                     try:
                         response = openai.chat.completions.create(
-                            model="ft:gpt-4o-mini-2024-07-18:korariko::DZmqELMy",
+                            model="ft:gpt-3.5-turbo-0125:korariko::DQ1ft67K",
                             messages=[
-                                {"role": "system","content": "You are a professional comedy writer specializing in clever wordplay and safe-but-edgy humor. Apply the Benign Violation principle — break an expectation or norm, but keep it safe and clever. Avoid anything offensive, political, or controversial. Be witty, surprising, and concise."},
-                                {"role": "user","content": f"""Generate a short, clever joke about: {keyword}. Rules: ,Setup must build a clear expectation , Punchline must subvert it with wordplay or unexpected twist ,Maximum 2 sentences,Must make logical sense""" },
+                                {"role": "system","content": "You are a professional comedy writer specializing in clever wordplay and safe-but-edgy humor. Apply the Benign Violation principle — break an expectation or norm, but keep it safe and clever."},
+                                {"role": "user","content": f"""Generate a short, clever joke about: {keyword}. {keyword} should be in the joke.""" },
                                     ],
                             temperature=0.9,
                         )

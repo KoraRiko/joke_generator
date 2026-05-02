@@ -79,10 +79,27 @@ WSGI_APPLICATION = 'joke_generator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-DATABASES = {
+# Use PostgreSQL on Render, SQLite locally
+import dj_database_url
+
+if os.getenv('DATABASE_URL'):
+    # Production: use PostgreSQL from Render
+    DATABASES = {
+        'default': dj_database_url.config(
+            default=os.getenv('DATABASE_URL'),
+            conn_max_age=600,
+        )
+    }
+else:
+    # Local development: use SQLite
+    DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'joke_generator',
+        'USER': 'postgres',
+        'PASSWORD': 'mamanatawa',
+        'HOST': 'localhost',
+        'PORT': '5432',
     }
 }
 
