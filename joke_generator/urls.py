@@ -15,9 +15,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import include,path
+from django.urls import include, path
+from django.views.decorators.http import require_http_methods
+from django.http import HttpResponse
+
+def ratelimit_exceeded(request, exception=None):
+    """Handle rate limit exceeded (429 Too Many Requests)"""
+    return HttpResponse(
+        '<h1>429 - Too Many Requests</h1><p>You have made too many requests. Please try again after an hour.</p>',
+        status=429,
+        content_type='text/html'
+    )
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', include("jokes.urls")),
 ]
+
+handler429 = ratelimit_exceeded

@@ -3,6 +3,7 @@ from django.conf import settings
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.http import JsonResponse
+from django_ratelimit.decorators import ratelimit
 
 from .forms import KeywordForm
 from .models import Joke
@@ -10,6 +11,9 @@ from .models import Joke
 # Set the OpenAI API key
 openai.api_key = settings.OPENAI_API_KEY
 
+# Rate limiting: 50 requests per hour per IP
+@ratelimit(key='ip', rate='50/h', method='POST')
+@ratelimit(key='ip', rate='100/h', method='GET')
 def joke_generator(request):
     form = KeywordForm()
     generated_text = None
