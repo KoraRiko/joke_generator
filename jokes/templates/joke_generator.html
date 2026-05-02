@@ -10,6 +10,16 @@
 </head>
 
 <body>
+    <!-- Age Verification Modal -->
+    <div id="age-modal" class="age-modal">
+        <div class="age-modal-content">
+            <h2>‼️Warning‼️</h2>
+            <p>This website contains AI-generated jokes that may include , аdult humor , 18+ content, offensive or harsh humor</p>
+            <p style="font-weight: 600; margin-top: 20px;">You must be 18 years or older to continue.</p>
+            <button id="age-confirm-btn" class="age-confirm-btn">I'm 18 or Older</button>
+        </div>
+    </div>
+
     <div class="page-shell">
         <header class="hero">
             <img class="emoji hero-emoji hero-emoji--top-left" src="{% static 'jokes/img/emoji-placeholder.svg' %}"
@@ -404,6 +414,24 @@
                         ratingForm.submit();
                     }
                 }
+            });
+
+            // Age Verification Modal
+            const ageModal = document.getElementById('age-modal');
+            const ageConfirmBtn = document.getElementById('age-confirm-btn');
+            const AGE_CONSENT_KEY = 'anegen_age_consent';
+
+            // Check if user already confirmed age
+            if (!localStorage.getItem(AGE_CONSENT_KEY)) {
+                ageModal.classList.remove('hidden');
+            } else {
+                ageModal.classList.add('hidden');
+            }
+
+            // Handle age confirmation
+            ageConfirmBtn.addEventListener('click', () => {
+                localStorage.setItem(AGE_CONSENT_KEY, 'true');
+                ageModal.classList.add('hidden');
             });
         });
     </script>
