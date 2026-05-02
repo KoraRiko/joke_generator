@@ -9,6 +9,11 @@ Comands for lockalhost:
   -------------------------
   Docker_hub : korarika/anegen
 
+Для обновления:
+docker build -t anegen:latest .
+docker tag anegen:latest korarika/anegen:latest
+docker push korarika/anegen:latest
+
 Comands for Docker:
 
 docker build -t anegen:latest .

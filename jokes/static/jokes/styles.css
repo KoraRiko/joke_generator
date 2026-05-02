@@ -333,10 +333,18 @@ body {
 
 .history-table {
     width: 100%;
+    min-width: 600px;
     border-collapse: collapse;
-    overflow: hidden;
     border-radius: 16px;
     background: var(--color-white);
+}
+
+.history-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-radius: 16px;
+    display: block;
 }
 
 .history-table th,
@@ -521,6 +529,15 @@ body {
     text-align: center;
 }
 
+.rating-btn {
+    border-color: #f5a75f !important;
+    transition: all 0.2s ease;
+}
+
+.rating-btn:hover {
+    background: rgba(245, 167, 95, 0.1) !important;
+}
+
 .footer {
     background: linear-gradient(180deg, #f97434 0%, #f66022 100%);
     color: #fff7ea;
@@ -612,6 +629,17 @@ body {
 
     .card {
         padding: 24px;
+    }
+
+    .rating-btn {
+        width: 24px !important;
+        height: 24px !important;
+        font-size: 0.75rem !important;
+        padding: 0 !important;
+    }
+
+    .rating-scale {
+        gap: 3px !important;
     }
 
     .history-text {

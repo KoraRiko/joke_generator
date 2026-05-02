@@ -55,7 +55,9 @@
                     </div>
 
                     <div class="form-actions">
-                        <button type="submit" name="generate_joke" class="primary-button">Generate anecdote</button>
+                        <button type="submit" name="generate_joke" class="primary-button" {% if last_unrated_joke %}disabled style="opacity: 0.6; cursor: not-allowed;"{% endif %}>
+                            Generate anecdote
+                        </button>
                     </div>
                 </form>
             </section>
@@ -80,7 +82,11 @@
                     </button>
                 </div>
                 <div class="rating-section" style="margin-top: 20px; padding-top: 20px; border-top: 1px solid #e0e0e0;">
+                    {% if last_unrated_joke and last_unrated_joke.id == generated_joke_id %}
+                    <p style="margin-bottom: 10px; font-weight: 500; color: #d32f2f;">⚠️ Please rate this joke to continue:</p>
+                    {% else %}
                     <p style="margin-bottom: 10px; font-weight: 500;">Rate this joke:</p>
+                    {% endif %}
                     <form method="POST" id="rating-form" style="display: flex; gap: 10px; align-items: center;">
                         {% csrf_token %}
                         <input type="hidden" name="joke_id" value="{{ generated_joke_id }}">
@@ -103,16 +109,17 @@
 
             <section class="card history-card" data-history-card>
                 <h2 class="card-title">History</h2>
-                <table class="history-table">
-                    <thead>
-                        <tr>
-                            <th scope="col">Keyword</th>
-                            <th scope="col">Generated Text</th>
-                            <th scope="col">Rating</th>
-                            <th scope="col">Date</th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                <div class="history-table-wrapper">
+                    <table class="history-table">
+                        <thead>
+                            <tr>
+                                <th scope="col">Keyword</th>
+                                <th scope="col">Generated Text</th>
+                                <th scope="col">Rating</th>
+                                <th scope="col">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
                         {% for item in history %}
                         {% with entry_id=forloop.counter0|stringformat:"s" %}
                         <tr class="history-row" data-history-id="{{ entry_id }}">
@@ -151,7 +158,8 @@
                         </tr>
                         {% endfor %}
                     </tbody>
-                </table>
+                    </table>
+                </div>
                 <div class="pagination-controls">
                     {% if history.has_previous %}
                     <a class="pagination-button" href="?page={{ history.previous_page_number }}"
