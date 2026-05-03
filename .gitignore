@@ -3,6 +3,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 *.log
+*.pyc
 
 # Local databases
 *.sqlite3

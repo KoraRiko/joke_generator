@@ -12,9 +12,11 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 import os
 from pathlib import Path
-OPENAI_API_KEY = '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'
-
-
+from dotenv import load_dotenv
+# Load environment variables from .env file
+load_dotenv()
+# Read API key from environment variable
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY', '')
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -79,7 +81,7 @@ WSGI_APPLICATION = 'joke_generator.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Use PostgreSQL on Render, SQLite locally
+# Use PostgreSQL on Render
 import dj_database_url
 
 if os.getenv('DATABASE_URL'):
@@ -91,7 +93,6 @@ if os.getenv('DATABASE_URL'):
         )
     }
 else:
-    # Local development: use SQLite
     DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',

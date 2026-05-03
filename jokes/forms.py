@@ -8,7 +8,7 @@ class KeywordForm(forms.Form):
         max_length=100,
         label="Enter keyword",
         widget=forms.TextInput(attrs={
-            "placeholder": "Enter text",
+            "placeholder": "Enter one keyword",
             "pattern": "[A-Za-z ]+",
             "title": "Only English letters allowed"
         })
