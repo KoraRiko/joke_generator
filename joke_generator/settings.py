@@ -29,12 +29,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o&j_0r(!jqjtxz=fww137rq-i+yro9usnjr9^@e&s3%+8zg&%o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-# Default to False for safety; set DJANGO_DEBUG=True in your .env when testing.
 DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
 
 # Read ALLOWED_HOSTS from environment variable, or use defaults
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,anecgenanegen.lat,anegen.onrender.com').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,anecgenanegen.lat,anegen.onrender.com').split(',')
 CSRF_TRUSTED_ORIGINS = ['https://anecgenerator.lat', 'https://anegen.onrender.com']
+
+print("DEBUG:", DEBUG)
+print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 
 # Application definition
 
@@ -50,6 +52,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -150,21 +153,6 @@ STATICFILES_DIRS = [
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-# Security Headers
-SECURE_SSL_REDIRECT = not DEBUG
-SESSION_COOKIE_SECURE = not DEBUG
-CSRF_COOKIE_SECURE = not DEBUG
-SECURE_HSTS_SECONDS = 31536000 if not DEBUG else 0
-SECURE_HSTS_INCLUDE_SUBDOMAINS = not DEBUG
-SECURE_HSTS_PRELOAD = not DEBUG
-X_FRAME_OPTIONS = 'DENY'
-SECURE_CONTENT_SECURITY_POLICY = {
-    'default-src': ("'self'",),
-    'script-src': ("'self'", "'unsafe-inline'"),
-    'style-src': ("'self'", "'unsafe-inline'", "fonts.googleapis.com"),
-    'font-src': ("'self'", "fonts.gstatic.com"),
-    'img-src': ("'self'", "data:"),
-}
 
 # Logging (console only)
 LOGGING = {
@@ -194,7 +182,16 @@ LOGGING = {
         },
     },
 }
-# Настройки безопасности для продакшена
+# Security settings
+X_FRAME_OPTIONS = 'DENY'
+SECURE_CONTENT_SECURITY_POLICY = {
+    'default-src': ("'self'",),
+    'script-src': ("'self'", "'unsafe-inline'"),
+    'style-src': ("'self'", "'unsafe-inline'", "fonts.googleapis.com"),
+    'font-src': ("'self'", "fonts.gstatic.com"),
+    'img-src': ("'self'", "data:"),
+}
+
 if not DEBUG:
     SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 
     SECURE_SSL_REDIRECT = True
@@ -203,7 +200,6 @@ if not DEBUG:
     SECURE_HSTS_SECONDS = 31536000
     SECURE_HSTS_INCLUDE_SUBDOMAINS = True
     SECURE_HSTS_PRELOAD = True
-    X_FRAME_OPTIONS = 'DENY'
 else:
     # Для локальной разработки
     SECURE_SSL_REDIRECT = False
