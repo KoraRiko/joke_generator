@@ -26,7 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-o&j_0r(!jqjtxz=fww137rq-i+yro9usnjr9^@e&s3%+8zg&%o'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
@@ -34,9 +34,6 @@ DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
 # Read ALLOWED_HOSTS from environment variable, or use defaults
 ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,anecgenanegen.lat,anegen.onrender.com').split(',')
 CSRF_TRUSTED_ORIGINS = ['https://anecgenerator.lat', 'https://anegen.onrender.com']
-
-print("DEBUG:", DEBUG)
-print("ALLOWED_HOSTS:", ALLOWED_HOSTS)
 
 # Application definition
 
