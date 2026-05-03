@@ -29,10 +29,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-o&j_0r(!jqjtxz=fww137rq-i+yro9usnjr9^@e&s3%+8zg&%o'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = os.getenv('DJANGO_DEBUG', 'True').lower() == 'true'
+# Default to False for safety; set DJANGO_DEBUG=True in your .env when testing.
+DEBUG = os.getenv('DJANGO_DEBUG', 'False').lower() == 'true'
 
 # Read ALLOWED_HOSTS from environment variable, or use defaults
-ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', '127.0.0.1,localhost,www.anecgenerator.lat,anecgenerator.lat,anegen.onrender.com').split(',')
+ALLOWED_HOSTS = os.getenv('DJANGO_ALLOWED_HOSTS', 'localhost,anecgenanegen.lat,anegen.onrender.com').split(',')
 CSRF_TRUSTED_ORIGINS = ['https://anecgenerator.lat', 'https://anegen.onrender.com']
 
 # Application definition
@@ -193,3 +194,19 @@ LOGGING = {
         },
     },
 }
+# Настройки безопасности для продакшена
+if not DEBUG:
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https') 
+    SECURE_SSL_REDIRECT = True
+    SESSION_COOKIE_SECURE = True
+    CSRF_COOKIE_SECURE = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+    X_FRAME_OPTIONS = 'DENY'
+else:
+    # Для локальной разработки
+    SECURE_SSL_REDIRECT = False
+    SESSION_COOKIE_SECURE = False
+    CSRF_COOKIE_SECURE = False
+    SECURE_HSTS_SECONDS = 0
