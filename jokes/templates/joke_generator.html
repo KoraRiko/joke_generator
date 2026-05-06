@@ -44,11 +44,11 @@
                 Generate your unique anecdotes within a few clicks!
             </p>
             <section class="card generator-card">
-                <form method="POST" class="generator-form">
+                <form method="POST" class="generator-form" style="display: flex; flex-direction: column; gap: 15px;">
                     {% csrf_token %}
-                    <div class="field-row">
-                        <label for="{{ form.keyword.id_for_label }}">Enter keyword</label>
-                        <div class="field-input">
+                    <div class="field-row" style="display: flex; align-items: center; gap: 20px;">
+                        <label for="{{ form.keyword.id_for_label }}" style="margin: 0; white-space: nowrap;">Enter keyword</label>
+                        <div class="field-input" style="flex: 1;">
                             {{ form.keyword }}
                             {% if form.keyword.errors %}
                             <span class="field-error" style="color: #d32f2f; display: block; margin-top: 8px; font-weight: 500;">
@@ -61,6 +61,14 @@
                                 }
                             </style>
                             {% endif %}
+                        </div>
+                        <div class="info-tooltip" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 24px; height: 24px; background: #f88745ea; color: white; border-radius: 50%; font-weight: bold; cursor: help; font-size: 14px;">
+                            ⓘ
+                            <div class="tooltip-content" style="position: absolute; bottom: 100%; left: 50%; transform: translateX(-50%); background: #f36f21; color: white; padding: 12px 16px; border-radius: 6px; font-size: 13px; font-weight: normal; white-space: nowrap; margin-bottom: 8px; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; z-index: 1000; box-shadow: 0 2px 8px rgba(0,0,0,0.2);">
+                                <u>For keyword use:</u> only English letters. Max 100 characters.<br>
+                                <u>Not use:</u> special characters (e.g, !@#\., etc. ) or emojis.
+                                <div style="position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; border-top: 6px solid #f36f21;"></div>
+                            </div>
                         </div>
                     </div>
 
@@ -203,6 +211,24 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
+            // Info tooltip functionality
+            const infoTooltips = document.querySelectorAll('.info-tooltip');
+            infoTooltips.forEach(tooltip => {
+                const content = tooltip.querySelector('.tooltip-content');
+                tooltip.addEventListener('mouseenter', () => {
+                    content.style.opacity = '1';
+                    content.style.visibility = 'visible';
+                });
+                tooltip.addEventListener('mouseleave', () => {
+                    content.style.opacity = '0';
+                    content.style.visibility = 'hidden';
+                });
+                tooltip.addEventListener('click', () => {
+                    content.style.opacity = content.style.opacity === '1' ? '0' : '1';
+                    content.style.visibility = content.style.visibility === 'visible' ? 'hidden' : 'visible';
+                });
+            });
+
             const bindResultActions = () => {
                 const resultText = document.querySelector('[data-generated-text]');
                 let copyBtn = document.querySelector('[data-action="copy"]');
