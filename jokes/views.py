@@ -65,7 +65,7 @@ def joke_generator(request):
                                 {"role": "system","content": "You are a professional comedy writer specializing in clever wordplay and safe-but-edgy humor. Apply the Benign Violation principle — break an expectation or norm, but keep it safe and clever."},
                                 {"role": "user","content": f"""Generate a short, clever joke about: {keyword}. Joke must visible include the word '{keyword}'.""" },
                                     ],
-                            temperature=0.9,
+                            temperature=0.5,
                         )
                         joke_text = response.choices[0].message.content.strip()
                     except Exception:
