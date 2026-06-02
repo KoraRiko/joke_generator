@@ -5,10 +5,6 @@ __pycache__/
 *.log
 *.pyc
 
-# Local databases
-*.sqlite3
-db.sqlite3
-
 # Django collected/static media
 staticfiles/
 media/

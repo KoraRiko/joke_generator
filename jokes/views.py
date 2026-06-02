@@ -1,9 +1,12 @@
 import openai
+import logging
 from django.conf import settings
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from django.http import JsonResponse
 from django_ratelimit.decorators import ratelimit
+
+logger = logging.getLogger(__name__)
 
 from .forms import KeywordForm
 from .models import Joke
@@ -15,12 +18,15 @@ openai.api_key = settings.OPENAI_API_KEY
 @ratelimit(key='ip', rate='50/h', method='POST')
 @ratelimit(key='ip', rate='100/h', method='GET')
 def joke_generator(request):
+    logger.info(f"===== REQUEST RECEIVED ===== Method: {request.method}")
     form = KeywordForm()
     generated_text = None
     generated_joke_id = None
 
     if request.method == "POST":
         # Handle joke explanation - return JSON
+        # Don't log full POST data to avoid exposing CSRF tokens
+        logger.info(f"POST request received")
         if "explain_joke" in request.POST:
             try:
                 joke_id = request.POST.get("joke_id")
@@ -54,25 +60,40 @@ def joke_generator(request):
         else:
             # Handle joke generation
             form = KeywordForm(request.POST)
+            keyword = form.cleaned_data.get("keyword") if form.is_valid() else None
+            logger.info(f"Joke generation request - keyword: '{keyword}'")
             if form.is_valid():
                 keyword = form.cleaned_data["keyword"]
+                logger.info(f"✅ Form VALID - Extracted keyword: '{keyword}'")
 
                 if "generate_joke" in request.POST:
+                    logger.info(f"Starting joke generation for keyword: '{keyword}'")
                     try:
+                        # Build the prompt
+                        prompt = f"""Generate a short, clever joke about: {keyword}. IMPORTANT: The joke MUST include the word '{keyword}' in it."""
+                        logger.info(f"OpenAI Prompt: {prompt}")
+                        
                         response = openai.chat.completions.create(
                             model="ft:gpt-3.5-turbo-0125:korariko::DQ1ft67K",
                             messages=[
                                 {"role": "system","content": "You are a professional comedy writer specializing in clever wordplay and safe-but-edgy humor. Apply the Benign Violation principle — break an expectation or norm, but keep it safe and clever."},
-                                {"role": "user","content": f"""Generate a short, clever joke about: {keyword}. Joke must visible include the word '{keyword}'.""" },
+                                {"role": "user","content": prompt},
                                     ],
-                            temperature=0.5,
+                            temperature=0.7,
                         )
                         joke_text = response.choices[0].message.content.strip()
-                    except Exception:
+                        logger.info(f"✅ OpenAI Response: {joke_text}")
+                    except Exception as e:
+                        logger.error(f"❌ OpenAI ERROR: {str(e)}")
                         joke_text = "Sorry, I couldn't generate a joke at the moment. Please try again later."
+                    
+                    logger.info(f"Saving to database - keyword: '{keyword}'")
                     joke_obj = Joke.objects.create(keyword=keyword, text=joke_text)
+                    logger.info(f"✅ Saved successfully with ID: {joke_obj.id}")
                     generated_text = joke_text
                     generated_joke_id = joke_obj.id
+            else:
+                logger.warning(f"❌ Form INVALID - Errors: {form.errors}")
 
                 form = KeywordForm()
 
