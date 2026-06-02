@@ -79,7 +79,7 @@ def joke_generator(request):
                                 {"role": "system","content": "You are a professional comedy writer specializing in clever wordplay and safe-but-edgy humor. Apply the Benign Violation principle — break an expectation or norm, but keep it safe and clever."},
                                 {"role": "user","content": prompt},
                                     ],
-                            temperature=0.7,
+                            temperature=0.5,
                         )
                         joke_text = response.choices[0].message.content.strip()
                         logger.info(f"✅ OpenAI Response: {joke_text}")
